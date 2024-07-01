@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
         $user = User::create([
             "name" => $request->name,
@@ -25,21 +28,50 @@ class AuthController extends Controller
                 "status" => "success",
                 "message" => "User created successfully",
             ];
+        } else {
+            return response()->json([
+                "status" => "error",
+                "message" => "Something went wrong",
+            ], 500);
         }
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Login the user.
      */
     public function login(Request $request)
     {
-        if(Auth::attempt($request->only(['email', 'password']))){
-            return [
-                "status" => "success",
-                "message" => "Invalid login details"
-            ];
+        $validator = Validator::make($request->all(), [
+            "email" => "required|email",
+            "password" => "required",
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
         }
+
+        $credentials = $request->only('email', 'password');
+
+        if (!Auth::attempt($credentials)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid credentials',
+            ], 401);
+        }
+
+        $user = Auth::user();
+
+        $token = 'ulr29' . '.' . Str::random(40);
+        $user->api_token = $token;
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'user' => $user,
+            'token' => $token,
+        ]);
     }
+
 
     /**
      * Display the specified resource.
