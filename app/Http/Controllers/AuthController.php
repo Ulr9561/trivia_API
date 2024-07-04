@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -52,48 +53,23 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid credentials',
-            ], 401);
+        if (! $toke = auth()->attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         $user = Auth::user();
+        $expiresAt = Carbon::now()->addMinutes(auth()->factory()->getTTL());
 
-        $token = 'ulr29' . '.' . Str::random(40);
+        /*$token = 'ulr29' . '.' . Str::random(40);
         $user->api_token = $token;
-        $user->save();
-
+        $user->save();*/
         return response()->json([
             'status' => 'success',
             'user' => $user,
-            'token' => $token,
+            'jwt' => $toke,
+            'expiresIn' => auth()->factory()->getTTL() * 60,
+            'expires_at' => $expiresAt->toDateTimeString(),
         ]);
-    }
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }
