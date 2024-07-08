@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Collection;
 use MongoDB\Laravel\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use MongoDB\Laravel\Relations\HasMany;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -22,7 +23,6 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
-        // 'api_token'
     ];
 
     /**
@@ -33,8 +33,12 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
-        // 'api_token'
     ];
+
+    public function getRoleIDs(): Collection
+    {
+        return Role::where('user_id', $this->id)->pluck('ref_id');
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -67,5 +71,9 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(): array
     {
         return [];
+    }
+
+    public function quizzes(): HasMany{
+        return $this->hasMany(Quiz::class);
     }
 }

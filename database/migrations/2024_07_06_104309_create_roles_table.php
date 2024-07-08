@@ -7,20 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('quizzes', function (Blueprint $table) {
+        Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->longText('description');
-            $table->string('category');
-            $table->json('questions');
+            $table->string('privilege');
+            $table->integer('ref_id');
             $table->foreignId('user_id')->constrained('users', '_id');
-            $table->string('level');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('quizzes');
+        Schema::dropIfExists('roles');
     }
 };

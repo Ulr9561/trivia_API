@@ -33,7 +33,7 @@ return [
         'mongodb' => [
             'driver' => 'mongodb',
             'dsn' => env('MONGODB_URI'),
-            'database' => 'laravel_api',
+            'database' => 'laravel_api_test',
         ],
 
         'sqlite' => [

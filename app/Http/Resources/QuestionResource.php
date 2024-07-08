@@ -2,27 +2,24 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Quiz;
+use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin Quiz */
-class QuizResource extends JsonResource
+/** @mixin Question */
+class QuestionResource extends JsonResource
 {
-
-
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
+            'description' => $this->description,
+            'options' => $this->options,
+            'answer' => $this->answer,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'name' => $this->name,
-            'level' => $this->level,
-            'description' => $this->description,
-            'category' => $this->category,
-            'questions' => $this->questions,
-            'tags' => $this->tags,
+
+            'quiz' => $this->quiz_id,
         ];
     }
 }

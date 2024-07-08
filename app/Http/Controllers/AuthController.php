@@ -3,13 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\UserResource;
+use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthController extends Controller
 {
@@ -24,10 +29,17 @@ class AuthController extends Controller
             "password" => Hash::make($request->password)
         ]);
 
+        $role = Role::create([
+            'privilege' => 'user',
+            'ref_id' => 2001,
+            'user_id' => $user->id,
+        ]);
+
         if ($user) {
             return [
                 "status" => "success",
                 "message" => "User created successfully",
+                "role" => $role->privilege,
             ];
         } else {
             return response()->json([
@@ -42,34 +54,47 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            "email" => "required|email",
-            "password" => "required",
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                "email" => "required|email",
+                "password" => "required",
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 422);
+            }
+
+            $credentials = $request->only('email', 'password');
+
+            if (!auth()->attempt($credentials)) {
+                throw new UnauthorizedHttpException('', 'Unauthorized');
+            }
+
+            $token = auth('api')->claims(['roles' => auth('api')->user()->getRoleIDs()])->attempt($credentials);
+
+            $user = Auth::user();
+            $expiresAt = Carbon::now()->addMinutes(auth()->factory()->getTTL());
+
+            return response()->json([
+                'status' => 'success',
+                'user' => $user,
+                'jwt' => $token,
+                'expiresIn' => auth()->factory()->getTTL() * 60,
+                'expires_at' => $expiresAt->toDateTimeString(),
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['error' => $e->errors()], 422);
+        } catch (UnauthorizedHttpException $e) {
+            return response()->json(['error' => "This credentials doesn't match our records. ". $e->getMessage()], 401);
+        } catch (Exception) {
+            return response()->json(['error' => 'An unexpected error occurred. Please try again later.'], 500);
         }
+    }
 
-        $credentials = $request->only('email', 'password');
-
-        if (! $toke = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        $user = Auth::user();
-        $expiresAt = Carbon::now()->addMinutes(auth()->factory()->getTTL());
-
-        /*$token = 'ulr29' . '.' . Str::random(40);
-        $user->api_token = $token;
-        $user->save();*/
-        return response()->json([
-            'status' => 'success',
-            'user' => $user,
-            'jwt' => $toke,
-            'expiresIn' => auth()->factory()->getTTL() * 60,
-            'expires_at' => $expiresAt->toDateTimeString(),
-        ]);
-
+    /**
+     * Show the user details
+    */
+    public function show(User $user){
+        return new UserResource($user);
     }
 }
