@@ -94,7 +94,8 @@ class AuthController extends Controller
     /**
      * Show the user details
     */
-    public function show(User $user){
+    public function show(){
+        $user = Auth::user();
         return new UserResource($user);
     }
 }
