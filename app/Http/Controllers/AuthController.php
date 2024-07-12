@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserRegisteredEvent;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\Role;
@@ -36,6 +37,7 @@ class AuthController extends Controller
         ]);
 
         if ($user) {
+            event(new UserRegisteredEvent($user));
             return [
                 "status" => "success",
                 "message" => "User created successfully",

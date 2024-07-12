@@ -8,6 +8,7 @@ use MongoDB\Laravel\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use MongoDB\Laravel\Relations\HasMany;
+use MongoDB\Laravel\Relations\HasOne;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -75,5 +76,9 @@ class User extends Authenticatable implements JWTSubject
 
     public function quizzes(): HasMany{
         return $this->hasMany(Quiz::class);
+    }
+
+    public function profile(): HasOne {
+        return $this->hasOne(Profile::class);
     }
 }
