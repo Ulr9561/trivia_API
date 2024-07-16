@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Events\UserRegisteredEvent;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\ProfileResource;
 use App\Http\Resources\UserResource;
+use App\Models\Profile;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
@@ -75,14 +77,14 @@ class AuthController extends Controller
             $token = auth('api')->claims(['roles' => auth('api')->user()->getRoleIDs()])->attempt($credentials);
 
             $user = Auth::user();
-            $expiresAt = Carbon::now()->addMinutes(auth()->factory()->getTTL());
+            $expiresIn = auth()->factory()->getTTL();
 
             return response()->json([
                 'status' => 'success',
                 'user' => $user,
                 'jwt' => $token,
-                'expiresIn' => auth()->factory()->getTTL() * 60,
-                'expires_at' => $expiresAt->toDateTimeString(),
+                'expiresIn' => $expiresIn,
+                'profile' => new ProfileResource(Profile::where('user_id', $user->id)->first()),
             ]);
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->errors()], 422);

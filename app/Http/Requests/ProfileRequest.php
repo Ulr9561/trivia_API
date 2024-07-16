@@ -12,7 +12,7 @@ class ProfileRequest extends FormRequest
             'solved_quizzes' => ['required', 'integer'],
             'user_id' => ['required', 'exists:users'],
             'score' => ['required', 'integer'],
-            'achievments' => ['required'],
+            'achievements' => ['required'],
             'rank' => ['required'],
         ];
     }

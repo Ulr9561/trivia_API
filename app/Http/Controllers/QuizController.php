@@ -14,7 +14,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class QuizController extends Controller
 {
@@ -31,6 +30,9 @@ class QuizController extends Controller
     {
         try {
             $data = $request->validated();
+            if(Quiz::where('name', $data['name'])->exists()){
+                return response()->json(['error' => 'Quiz with the same name already exists.'], 409);
+            }
 
             $quiz = Quiz::create([
                 'name' => $data['name'],
@@ -84,6 +86,10 @@ class QuizController extends Controller
                 'level' => "required|string|max:255",
                 'tags' => "required|array|max:255",
             ]);
+
+            if(Quiz::where('name', $data['name'])->where('_id', '!=', $id)->exists()){
+                return response()->json(['error' => 'Quiz with the same name already exists.'], 409);
+            }
 
             $quiz->update($data);
 

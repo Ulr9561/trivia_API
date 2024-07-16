@@ -6,6 +6,7 @@ use App\Models\Profile;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Support\Facades\Auth;
 
 class ProfilePolicy
 {
@@ -13,17 +14,20 @@ class ProfilePolicy
 
     public function viewAny(User $user): bool
     {
-        return Role::where("user_id", "=", $user->id)->privilege === 'admin';
+        $role = Role::where("user_id", $user->id)->first();
+        return $role && $role->privilege === 'admin';
     }
 
     public function view(User $user, Profile $profile): bool
     {
+        $user = Auth::user();
         return $user->id === $profile->user_id;
     }
 
     public function create(User $user): bool
     {
-        return Role::where("user_id", "=", $user->id)->privilege === 'admin';
+        $role = Role::where("user_id", $user->id)->first();
+        return $role && $role->privilege === 'admin';
     }
 
     public function update(User $user, Profile $profile): bool

@@ -3,31 +3,34 @@
 namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class QuestionValidatorRule implements Rule
 {
     public function passes($attribute, $value): bool
     {
         foreach ($value as $question) {
-            if (! is_object($question) || empty($question->description) || empty($question->answer)) {
+            if (!is_object($question) || empty($question->description) || empty($question->answer)) {
                 return false;
             }
 
-            if (! is_array($question->options) || empty($question->options)) {
+            if (!is_array($question->options) || count($question->options) < 3) {
                 return false;
             }
+
+            $answerPresent = false;
 
             foreach ($question->options as $option) {
-                if (! is_object($option) || count(get_object_vars($option)) !== 1) {
+                if (!is_string($option) || empty($option)) {
                     return false;
                 }
-                $keys = array_keys(get_object_vars($option));
-                $key = $keys[0];
-                $value = $option->$key;
+                if ($option === $question->answer) {
+                    $answerPresent = true;
+                }
+            }
 
-                if (! is_string($key) || empty($value)) {
-                    return false;
-                }
+            if (!$answerPresent) {
+                return false;
             }
         }
 
@@ -36,6 +39,6 @@ class QuestionValidatorRule implements Rule
 
     public function message(): string
     {
-        return 'Chaque question doit être un objet avec des attributs valides.';
+        return 'Chaque question doit être un objet avec une description, une réponse et au moins 3 options valides. La réponse doit être présente parmi les options.';
     }
 }

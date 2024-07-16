@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileRequest;
 use App\Http\Resources\ProfileResource;
 use App\Models\Profile;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileController
 {
@@ -25,11 +28,21 @@ class ProfileController
         return new ProfileResource(Profile::create($request->validated()));
     }
 
-    public function show(Profile $profile)
+    public function show()
     {
-        $this->authorize('view', $profile);
+        try {
+            $user = Auth::user();
+            $profile = Profile::where('user_id', $user->id)->firstOrFail();
+            $this->authorize('view', $profile);
 
-        return new ProfileResource($profile);
+            return new ProfileResource($profile);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Profile not found'], 404);
+        } catch (AuthorizationException $e) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
     }
 
     public function update(ProfileRequest $request, Profile $profile)

@@ -17,7 +17,7 @@ class ProfileResource extends JsonResource
             'id' => $this->id,
             'solved_quizzes' => $this->solved_quizzes,
             'score' => $this->score,
-            'achievments' => $this->achievments,
+            'achievements' => $this->achievements,
             'rank' => $this->rank,
             'user_id' => $this->user_id,
             'user' => new UserResource($this->whenLoaded('user')),

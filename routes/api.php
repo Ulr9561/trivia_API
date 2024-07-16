@@ -19,8 +19,9 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
     Route::apiResource('questions', QuestionController::class);
 
     Route::get('profile', [ProfileController::class, 'show']);
+    Route::middleware(RoleMiddleware::class)->prefix('admin')->group(function () {
+        Route::apiResource('profile', ProfileController::class);
+    });
 });
 
-Route::middleware(['auth:api', RoleMiddleware::class])->group(function () {
-    Route::apiResource('profile', ProfileController::class);
-});
+

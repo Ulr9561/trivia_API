@@ -13,7 +13,7 @@ class Profile extends Model
         'solved_quizzes',
         'user_id',
         'score',
-        'achievments',
+        'achievements',
         'rank',
     ];
 
@@ -25,7 +25,7 @@ class Profile extends Model
     protected function casts(): array
     {
         return [
-            'achievments' => 'array',
+            'achievements' => 'array',
         ];
     }
 }

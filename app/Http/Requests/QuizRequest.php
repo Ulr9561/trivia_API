@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Http\Enums\CategoryEnum;
-use App\Rules\QuestionValidatorRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -24,27 +23,27 @@ class QuizRequest extends FormRequest
         return [
             "name" => "required|min:5|max:150",
             "description" => "required|min:5|max:150",
-            "category" => "required", Rule::in(
-                [
-                    CategoryEnum::ARTS,
-                    CategoryEnum::GAMING,
-                    CategoryEnum::GENERAL,
-                    CategoryEnum::SCIENCE,
-                    CategoryEnum::SPORTS,
-                    CategoryEnum::ANIME,
-                    CategoryEnum::INFORMATIQUE,
-                    CategoryEnum::DEVINETTES,
-                ]
-            ),
-            "questions" => "required", new QuestionValidatorRule(),
-            "level" => "required", Rule::in(
-                [
-                    "Débutant",
-                    "Amateur",
-                    "Expert",
-                    "Légende"
-                ]
-            ),
+            "category" => ["required", Rule::in([
+                CategoryEnum::ARTS,
+                CategoryEnum::GAMING,
+                CategoryEnum::GENERAL,
+                CategoryEnum::SCIENCE,
+                CategoryEnum::SPORTS,
+                CategoryEnum::ANIME,
+                CategoryEnum::INFORMATIQUE,
+                CategoryEnum::DEVINETTES,
+            ])],
+            "questions" => "required", "array",
+            "questions.*.description" => "required|string|min:5|max:255",
+            "questions.*.options" => "required|array|min:2",
+            "questions.*.options.*" => "required|string|distinct",
+            "questions.*.answer" => "required|string|in_array:questions.*.options.*",
+            "level" => ["required", Rule::in([
+                "Debutant",
+                "Amateur",
+                "Expert",
+                "Légende"
+            ])],
             "tags" => "required|array"
         ];
     }
