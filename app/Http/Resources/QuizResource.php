@@ -15,14 +15,16 @@ class QuizResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'name' => $this->name,
-            'level' => $this->level,
-            'description' => $this->description,
+            'duration' => $this->duration . " min",
             'category' => $this->category,
             'questions' => $this->questions,
+            'questions_number' => $this->questions()->count() . " questions",
+            'level' => $this->level,
             'tags' => $this->tags,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'user_id' => $this->user_id,
         ];
     }
 }

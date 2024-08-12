@@ -10,8 +10,9 @@ return new class extends Migration {
         Schema::create('quizzes', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->longText('description');
+            $table->integer('questions_number');
             $table->string('category');
+            $table->string('duration');
             $table->json('questions');
             $table->foreignId('user_id')->constrained('users', '_id');
             $table->string('level');

@@ -22,7 +22,7 @@ class QuizRequest extends FormRequest
     {
         return [
             "name" => "required|min:5|max:150",
-            "description" => "required|min:5|max:150",
+            "duration" => "required|integer",
             "category" => ["required", Rule::in([
                 CategoryEnum::ARTS,
                 CategoryEnum::GAMING,
@@ -33,7 +33,7 @@ class QuizRequest extends FormRequest
                 CategoryEnum::INFORMATIQUE,
                 CategoryEnum::DEVINETTES,
             ])],
-            "questions" => "required", "array",
+            "questions" => "required|array",
             "questions.*.description" => "required|string|min:5|max:255",
             "questions.*.options" => "required|array|min:2",
             "questions.*.options.*" => "required|string|distinct",
@@ -42,7 +42,7 @@ class QuizRequest extends FormRequest
                 "Debutant",
                 "Amateur",
                 "Expert",
-                "Légende"
+                "Legende"
             ])],
             "tags" => "required|array"
         ];

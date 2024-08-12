@@ -11,6 +11,7 @@ use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -24,15 +25,15 @@ class AuthController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request): JsonResponse|array
     {
-        $user = User::create([
+        $user = (new User)->create([
             "name" => $request->name,
             "email" => $request->email,
             "password" => Hash::make($request->password)
         ]);
 
-        $role = Role::create([
+        $role = (new Role)->create([
             'privilege' => 'user',
             'ref_id' => 2001,
             'user_id' => $user->id,
@@ -56,7 +57,7 @@ class AuthController extends Controller
     /**
      * Login the user.
      */
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         try {
             $validator = Validator::make($request->all(), [

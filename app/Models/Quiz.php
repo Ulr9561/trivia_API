@@ -18,7 +18,7 @@ class Quiz extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'description', 'category', 'questions', 'level', 'tags', 'user_id'
+        'name', 'duration', 'category', 'questions', 'level', 'questions_number', 'tags', 'user_id',
     ];
 
     protected $casts = [
@@ -31,6 +31,14 @@ class Quiz extends Model
         return $this->hasMany(Question::class);
     }
     public function user(): BelongsTo{
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', '_id');
+    }
+    protected static function booted(): void
+    {
+        static::deleting(function ($quiz) {
+            $quiz->questions()->each(function ($question) {
+                $question->delete();
+            });
+        });
     }
 }
