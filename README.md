@@ -23,9 +23,9 @@ Avant de commencer, assurez-vous d'avoir installé les éléments suivants :
 
 1. Clonez le dépôt :
 
-   ```bash
+   ```powershell
    git clone https://github.com/Ulr9561/trivia_API.git
-   cd quiz-api
+   cd trivia_API
    ```
 
    
