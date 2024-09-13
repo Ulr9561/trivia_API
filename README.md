@@ -14,17 +14,17 @@ Une API de quiz développée avec Laravel qui permet de récupérer des quiz et 
 
 Avant de commencer, assurez-vous d'avoir installé les éléments suivants :
 
-- [PHP >= 8.0](https://www.php.net/)
+- [PHP >= 8.2](https://www.php.net/)
 - [Composer](https://getcomposer.org/)
 - [MongoDB](https://www.mongodb.com/)
-- [Laravel 9.x](https://laravel.com/)
+- [Laravel 11.x](https://laravel.com/)
 
 ## Installation
 
 1. Clonez le dépôt :
 
    ```bash
-   git clone https://github.com/votre-utilisateur/quiz-api.git
+   git clone https://github.com/Ulr9561/trivia_API.git
    cd quiz-api
    ```
 
